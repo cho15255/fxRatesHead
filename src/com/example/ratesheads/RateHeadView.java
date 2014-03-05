@@ -4,14 +4,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.oanda.fxtrade.sdk.FxClient;
-import com.oanda.fxtrade.sdk.Price;
-import com.oanda.fxtrade.sdk.network.PriceListener;
-
-import android.R.color;
 import android.app.ActionBar.LayoutParams;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.text.Spannable;
@@ -23,10 +17,11 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.oanda.fxtrade.sdk.FxClient;
+import com.oanda.fxtrade.sdk.Price;
+import com.oanda.fxtrade.sdk.network.PriceListener;
 
 public class RateHeadView extends View {
 	private TextView mTextView;
@@ -34,45 +29,43 @@ public class RateHeadView extends View {
 
 	private static Boolean isRateVisible;
 	private WindowManager.LayoutParams headParam;
-	
+
 	private boolean headExist;
 	private boolean deleteHead;
-	
+
 	private BigDecimal currentBid;
 	private BigDecimal currentAsk;
 	private BigDecimal newBid;
 	private BigDecimal newAsk;
 	private static Boolean isHeadMoved;
 
-	
 	public RateHeadView(final Context context, WindowManager windowManager) {
-		super (context);
+		super(context);
 		DisplayMetrics displaymetrics = new DisplayMetrics();
 		windowManager.getDefaultDisplay().getMetrics(displaymetrics);
 		final int screenHeight = displaymetrics.heightPixels;
 		final int screenWidth = displaymetrics.widthPixels;
-		
+
 		mTextView = new TextView(context);
-		
+
 		isRateVisible = false;
 		isHeadMoved = false;
 		deleteHead = false;
-		
-		
+
 		headParam = new WindowManager.LayoutParams();
 
 		headParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 		mTextView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT,
 				LayoutParams.WRAP_CONTENT));
 		headParam.format = PixelFormat.RGBA_8888;
-		headParam.gravity = Gravity.CENTER|Gravity.RIGHT;
+		headParam.gravity = Gravity.CENTER | Gravity.RIGHT;
 		headParam.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
 		headParam.width = LayoutParams.WRAP_CONTENT;
 		headParam.height = LayoutParams.WRAP_CONTENT;
 		mWindowManager = windowManager;
 		mWindowManager.addView(mTextView, headParam);
 		headExist = true;
-		
+
 		mTextView.setOnTouchListener(new View.OnTouchListener() {
 			private int initialX;
 			private int initialY;
@@ -87,7 +80,7 @@ public class RateHeadView extends View {
 					initialY = headParam.y;
 					initialTouchX = event.getRawX();
 					initialTouchY = event.getRawY();
-					
+
 					isHeadMoved = false;
 					return true;
 				case MotionEvent.ACTION_UP:
@@ -96,14 +89,16 @@ public class RateHeadView extends View {
 					MainActivity.hideDeleteButton();
 					if (!isHeadMoved) {
 						if (!MainActivity.settingButton.isShown()) {
-							MainActivity.settingButton.setVisibility(View.VISIBLE);
-							MainActivity.tradeButton.setVisibility(View.VISIBLE);
+							MainActivity.settingButton
+									.setVisibility(View.VISIBLE);
+							MainActivity.tradeButton
+									.setVisibility(View.VISIBLE);
 						} else {
 							MainActivity.settingButton.setVisibility(View.GONE);
 							MainActivity.tradeButton.setVisibility(View.GONE);
 						}
 					}
-					
+
 					if (deleteHead) {
 						if (MainActivity.settingButton.isShown()) {
 							MainActivity.settingButton.setVisibility(View.GONE);
@@ -112,10 +107,10 @@ public class RateHeadView extends View {
 						headExist = false;
 						mWindowManager.removeView(mTextView);
 						MainActivity.hideDeleteButton();
-						
+
 						deleteHead = false;
 					}
-					
+
 					return true;
 				case MotionEvent.ACTION_MOVE:
 					headParam.x = initialX
@@ -125,16 +120,17 @@ public class RateHeadView extends View {
 
 					MainActivity.showDeleteButton();
 
-					//Log.d("View", headParam.y + " " + MainActivity.deleteViewParam.y + " "
-							//+ headParam.height);
+					// Log.d("View", headParam.y + " " +
+					// MainActivity.deleteViewParam.y + " "
+					// + headParam.height);
 
-					if (headParam.y + headParam.height + (screenHeight/2) > MainActivity.deleteViewParam.y) {
+					if (headParam.y + headParam.height + (screenHeight / 2) > MainActivity.deleteViewParam.y) {
 						deleteHead = true;
 					} else {
 						deleteHead = false;
 					}
 					mWindowManager.updateViewLayout(mTextView, headParam);
-					
+
 					isHeadMoved = true;
 					return true;
 				}
@@ -150,10 +146,10 @@ public class RateHeadView extends View {
 		mTextView.setPadding(15, 10, 15, 10);
 		mTextView.setText(text);
 	}
-	
-	public void updatePrice(Price price){
-		if (headExist){
-			if (newBid == null || newAsk == null){
+
+	public void updatePrice(Price price) {
+		if (headExist) {
+			if (newBid == null || newAsk == null) {
 				newBid = price.bid();
 				newAsk = price.ask();
 				currentBid = newBid;
@@ -168,17 +164,19 @@ public class RateHeadView extends View {
 			BigDecimal precision = price.instrument().precision();
 			difference = difference.movePointRight(precision.intValue());
 			Log.i("DIFFERENCE", difference.intValue() + "");
-			headParam.y = headParam.y - (difference.intValue()*2);
+			headParam.y = headParam.y - (difference.intValue() * 2);
 			final int sign = difference.signum();
 			switch (sign) {
-			case 1: 
-				mTextView.setBackgroundResource(R.drawable.rounded_rectangle_green_head);
+			case 1:
+				mTextView
+						.setBackgroundResource(R.drawable.rounded_rectangle_green_head);
 				break;
-			case 0: 
+			case 0:
 				mTextView.setBackgroundResource(R.drawable.rounded_rectangle);
 				break;
 			case -1:
-				mTextView.setBackgroundResource(R.drawable.rounded_rectangle_red);
+				mTextView
+						.setBackgroundResource(R.drawable.rounded_rectangle_red);
 				break;
 			default:
 				break;
@@ -186,28 +184,35 @@ public class RateHeadView extends View {
 			mWindowManager.updateViewLayout(mTextView, headParam);
 		}
 	}
-	
+
 	@Override
 	public void setOnTouchListener(OnTouchListener l) {
 		// TODO Auto-generated method stub
 		super.setOnTouchListener(l);
 	}
-	
+
 	public void fetchPrices(final FxClient fxSession, final String currentHead) {
-		
+
 		fxSession.getPrices(new PriceListener() {
 			@Override
 			public void onSuccess(List<Price> prices) {
 				for (Price price : prices) {
 					updatePrice(price);
-					String instrument=getResources().getString(R.string.instrument, price.instrument().displayName());
-					String text = instrument + "\n"
-							+ "Bid: " + price.bid() + "\n"
-							+ "Ask: " + price.ask();
-					 final SpannableStringBuilder sb = new SpannableStringBuilder(text);
-				     final StyleSpan bss = new StyleSpan(android.graphics.Typeface.BOLD); // Span to make text bold
-				     sb.setSpan(bss, 0, instrument.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE); // make first 4 characters Bol
-					 setText(sb);
+					String instrument = getResources().getString(
+							R.string.instrument,
+							price.instrument().displayName());
+					String text = instrument + "\n" + "Bid: " + price.bid()
+							+ "\n" + "Ask: " + price.ask();
+					final SpannableStringBuilder sb = new SpannableStringBuilder(
+							text);
+					final StyleSpan bss = new StyleSpan(
+							android.graphics.Typeface.BOLD); // Span to make
+																// text bold
+					sb.setSpan(bss, 0, instrument.length(),
+							Spannable.SPAN_INCLUSIVE_INCLUSIVE); // make first 4
+																	// characters
+																	// Bol
+					setText(sb);
 				}
 			}
 
@@ -220,7 +225,8 @@ public class RateHeadView extends View {
 			}
 		});
 	}
-	public void setRun(final FxClient fxSession,final String currentHead){
+
+	public void setRun(final FxClient fxSession, final String currentHead) {
 		Runnable prices = new Runnable() {
 			@Override
 			public void run() {

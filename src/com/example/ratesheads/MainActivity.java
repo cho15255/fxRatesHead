@@ -1,16 +1,13 @@
 package com.example.ratesheads;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import android.R.color;
-import android.R.integer;
 import android.app.ActionBar.LayoutParams;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.FragmentManager;
-import android.app.ListFragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -19,32 +16,24 @@ import android.graphics.PixelFormat;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GestureDetectorCompat;
-import android.text.SpannableString;
-import android.text.style.UnderlineSpan;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
-import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.oanda.fxtrade.sdk.FxClient;
 import com.oanda.fxtrade.sdk.Instrument;
-import com.oanda.fxtrade.sdk.Price;
 import com.oanda.fxtrade.sdk.User;
 import com.oanda.fxtrade.sdk.network.InstrumentListener;
 import com.oanda.fxtrade.sdk.network.LoginListener;
-import com.oanda.fxtrade.sdk.network.PriceListener;
 
 public class MainActivity extends Activity implements
 		GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
@@ -161,8 +150,11 @@ public class MainActivity extends Activity implements
 
 			@Override
 			public void onClick(View v) {
-				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://oanda.com/ratesHeads"));
+				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri
+						.parse("http://oanda.com/ratesHeads"));
 				startActivity(browserIntent);
+				MainActivity.settingButton.setVisibility(View.GONE);
+				MainActivity.tradeButton.setVisibility(View.GONE);
 			}
 		});
 
