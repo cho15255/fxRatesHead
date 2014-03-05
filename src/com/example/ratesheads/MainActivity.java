@@ -54,10 +54,10 @@ public class MainActivity extends Activity implements
 
 	public static Button settingButton;
 	public static Button tradeButton;
-	
+
 	private WindowManager.LayoutParams settingParam;
 	private WindowManager.LayoutParams tradeParam;
-	
+
 	private ArrayAdapter<String> mRatesAdapter;
 	private ProgressDialog mDialog;
 	private static Handler handler;
@@ -72,7 +72,6 @@ public class MainActivity extends Activity implements
 	private FxClient mFxSession;
 	private Dialog stripesDialog;
 	private Dialog triangleDialog;
-
 
 	public static WindowManager.LayoutParams deleteViewParam;
 
@@ -105,7 +104,10 @@ public class MainActivity extends Activity implements
 		mDeleteView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
 				100));
 		mDeleteView.setBackgroundColor(Color.RED);
-		//mDeleteView.setText("Delete");
+		mDeleteView.setText(R.string.delete);
+		mDeleteView.setGravity(Gravity.CENTER);
+		mDeleteView.setTextColor(Color.WHITE);
+		mDeleteView.setTextSize(20);
 
 		deleteViewParam = new WindowManager.LayoutParams();
 		deleteViewParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
@@ -116,26 +118,28 @@ public class MainActivity extends Activity implements
 		deleteViewParam.y = screenHeight - mDeleteView.getLayoutParams().height;
 		mWindowManager.addView(mDeleteView, deleteViewParam);
 		mDeleteView.setVisibility(View.GONE);
-		
+
 		settingParam = new WindowManager.LayoutParams();
 		settingParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 		settingButton = new Button(this);
 		settingButton.setLayoutParams(new LayoutParams(screenWidth / 2, 130));
 		settingButton.setBackgroundResource(color.black);
 		settingButton.setText("Settings");
-		settingButton.setTextColor(getResources().getColor(R.color.oanda_green));
+		settingButton
+				.setTextColor(getResources().getColor(R.color.oanda_green));
 		settingButton.setGravity(Gravity.CENTER);
 		settingButton.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
-				Intent mainIntent = new Intent(getApplicationContext(), MainActivity.class);
+				Intent mainIntent = new Intent(getApplicationContext(),
+						MainActivity.class);
 				startActivity(mainIntent);
 				MainActivity.settingButton.setVisibility(View.GONE);
 				MainActivity.tradeButton.setVisibility(View.GONE);
 			}
 		});
-		
+
 		settingParam.format = PixelFormat.RGBA_8888;
 		settingParam.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
 		settingParam.gravity = Gravity.TOP | Gravity.LEFT;
@@ -153,14 +157,14 @@ public class MainActivity extends Activity implements
 		tradeButton.setTextColor(getResources().getColor(R.color.oanda_green));
 		tradeButton.setGravity(Gravity.CENTER);
 		tradeButton.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
-		
+
 		tradeParam.format = PixelFormat.RGBA_8888;
 		tradeParam.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
 		tradeParam.gravity = Gravity.TOP | Gravity.RIGHT;
@@ -189,32 +193,35 @@ public class MainActivity extends Activity implements
 		});
 		final InstrumentList instrumentList = new InstrumentList();
 		mFxSession.getInstruments(new InstrumentListener() {
-			
+
 			@Override
 			public void onSuccess(List<Instrument> arg0) {
-				List<String> instrumentListString = new ArrayList<String>(arg0.size()); 
-				for (Instrument instrument : arg0){
+				List<String> instrumentListString = new ArrayList<String>(arg0
+						.size());
+				for (Instrument instrument : arg0) {
 					instrumentListString.add(instrument.instrument());
 				}
 				instrumentsList = instrumentListString;
 				instrumentList.setInstruments(instrumentListString);
 			}
-			
+
 			@Override
 			public void onError(Exception arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
 		FragmentManager fragmentManager = getFragmentManager();
-		fragmentManager.beginTransaction().add(R.id.listFragmentRelative, instrumentList, "LIST").commit();
+		fragmentManager.beginTransaction()
+				.add(R.id.listFragmentRelative, instrumentList, "LIST")
+				.commit();
 	}
-		
-		private void addHead() {
-			
-			final RateHeadView headView = new RateHeadView(this, mWindowManager);
-			headView.setRun(mFxSession, currentHead);
-		}
+
+	private void addHead() {
+
+		final RateHeadView headView = new RateHeadView(this, mWindowManager);
+		headView.setRun(mFxSession, currentHead);
+	}
 
 	public static void showDeleteButton() {
 		mDeleteView.setVisibility(View.VISIBLE);
@@ -281,15 +288,16 @@ public class MainActivity extends Activity implements
 	public boolean onSingleTapUp(MotionEvent e) {
 		return false;
 	}
-	
-	public static void setHeadInstrument(String instrument){
+
+	public static void setHeadInstrument(String instrument) {
 		currentHead = instrument;
 	}
-	
-	public static void postHandle(Runnable prices){
+
+	public static void postHandle(Runnable prices) {
 		handler.post(prices);
 	}
-	public static void postHandleDelay(Runnable runnable){
+
+	public static void postHandleDelay(Runnable runnable) {
 		handler.postDelayed(runnable, POLL_INTERVAL);
 	}
 
