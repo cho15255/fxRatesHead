@@ -11,6 +11,7 @@ import com.oanda.fxtrade.sdk.network.PriceListener;
 
 import android.app.ActionBar.LayoutParams;
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Color;
@@ -25,7 +26,9 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -49,10 +52,15 @@ public class MainActivity extends Activity implements GestureDetector.OnGestureL
 	private static final String API_KEY = "0325ee6232373738";
 	
 	private Boolean isRateVisible;
-	private TextView view;
 	private Button settingButton;
 	private Button tradeButton;
 	private FxClient mFxSession;
+	private Dialog stripesDialog;
+	private Dialog triangleDialog;
+	
+	private WindowManager.LayoutParams settingParam;
+	private WindowManager.LayoutParams tradeParam;
+	private WindowManager.LayoutParams deleteViewParam;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -66,52 +74,86 @@ public class MainActivity extends Activity implements GestureDetector.OnGestureL
 		int screenHeight = displaymetrics.heightPixels;
 		int screenWidth = displaymetrics.widthPixels;
 		
-		final WindowManager.LayoutParams headParam = new WindowManager.LayoutParams();
+		stripesDialog = new Dialog(this);
+		stripesDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		triangleDialog = new Dialog(this);
+		triangleDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		
+		Button stripeOptionsButton = (Button) findViewById(R.id.stripesButton);
+		stripeOptionsButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				stripesDialog.setContentView(R.layout.dialog);
+				stripesDialog.setCancelable(false);
+				stripesDialog.show();
+				
+				Button stripeOptionsDialogButton = (Button) stripesDialog.findViewById(R.id.dialog_button);
+				stripeOptionsDialogButton.setText("Add Stripe");
+				stripeOptionsDialogButton.setOnClickListener(new OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
+						stripesDialog.dismiss();
+						addHead();
+					}
+				});
+			}
+		});
+		
+		Button triangleOptionsButton = (Button) findViewById(R.id.triangleButton);
+		triangleOptionsButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				triangleDialog.setContentView(R.layout.dialog);
+				triangleDialog.setCancelable(false);
+				triangleDialog.show();
+				
+				Button triangleOptionsDialogButton = (Button) triangleDialog.findViewById(R.id.dialog_button);
+				triangleOptionsDialogButton.setText("Add Triangle");
+				triangleOptionsDialogButton.setOnClickListener(new OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
+						triangleDialog.dismiss();
+						addHead();
+					}
+				});
+			}
+		});
+		/*final WindowManager.LayoutParams headParam = new WindowManager.LayoutParams();
 		headParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 		final ImageView headView = new ImageView(this);
 		headView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 		headView.setImageResource(R.drawable.ic_launcher);
-		ViewGroup parent = (ViewGroup)headView .getParent();
-		if (parent != null)
-		  parent.removeView(headView );
 		headParam.format = PixelFormat.RGBA_8888;
 		headParam.gravity = Gravity.TOP;
 		headParam.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
 		headParam.width = (parent != null) ? LayoutParams.WRAP_CONTENT : headView .getLayoutParams().width;
-		headParam.height = (parent!=null) ? LayoutParams.WRAP_CONTENT : headView .getLayoutParams().height;
+		headParam.height = (parent!=null) ? LayoutParams.WRAP_CONTENT : headView .getLayoutParams().height;*/
 		
-		final WindowManager.LayoutParams settingParam = new WindowManager.LayoutParams();
+		mWindowManager=(WindowManager)getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
+		
+		settingParam = new WindowManager.LayoutParams();
 		settingParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 		settingButton = new Button(this);
 		settingButton.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-		parent = (ViewGroup) settingButton.getParent();
-		if (parent != null)
-			parent.removeView(settingButton);
 		settingParam.format = PixelFormat.RGBA_8888;
 		settingParam.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
 		settingParam.gravity = Gravity.TOP | Gravity.LEFT;
-		settingParam.width = parent != null ? LayoutParams.WRAP_CONTENT : settingButton
-				.getLayoutParams().width;
-		settingParam.height = parent != null ? LayoutParams.WRAP_CONTENT : settingButton
-				.getLayoutParams().height;
+		settingParam.width = LayoutParams.WRAP_CONTENT;
+		settingParam.height = LayoutParams.WRAP_CONTENT;
 		
-		final WindowManager.LayoutParams tradeParam = new WindowManager.LayoutParams();
+		tradeParam = new WindowManager.LayoutParams();
 		tradeParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 		tradeButton = new Button(this);
 		tradeButton.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-		parent = (ViewGroup) tradeButton.getParent();
-		if (parent != null)
-			parent.removeView(tradeButton);
 		tradeParam.format = PixelFormat.RGBA_8888;
 		tradeParam.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
 		tradeParam.gravity = Gravity.TOP | Gravity.RIGHT;
-		tradeParam.width = parent != null ? LayoutParams.WRAP_CONTENT : tradeButton
-				.getLayoutParams().width;
-		tradeParam.height = parent != null ? LayoutParams.WRAP_CONTENT : tradeButton
-				.getLayoutParams().height;
-
-		mWindowManager = (WindowManager)getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
-		mWindowManager.addView(headView ,headParam);
+		tradeParam.width = LayoutParams.WRAP_CONTENT; 
+		tradeParam.height = LayoutParams.WRAP_CONTENT;
 
 		mDetector = new GestureDetectorCompat(this, this);
 		mDetector.setOnDoubleTapListener(this);
@@ -120,7 +162,7 @@ public class MainActivity extends Activity implements GestureDetector.OnGestureL
 		mDeleteView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 100));
 		mDeleteView.setBackgroundColor(Color.RED);
 		
-		final WindowManager.LayoutParams deleteViewParam = new WindowManager.LayoutParams();
+		deleteViewParam = new WindowManager.LayoutParams();
 		deleteViewParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 		deleteViewParam.format = PixelFormat.RGBA_8888;
 		deleteViewParam.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
@@ -129,8 +171,52 @@ public class MainActivity extends Activity implements GestureDetector.OnGestureL
 		deleteViewParam.y = screenHeight - mDeleteView.getLayoutParams().height;
 		mWindowManager.addView(mDeleteView, deleteViewParam);
 		mDeleteView.setVisibility(View.GONE);
+		
+		
 
+		
+			  
+		
 
+		handler = new Handler();
+		mFxSession = new FxClient(this, API_KEY);
+
+		mDialog = new ProgressDialog(this);
+		mDialog.setCancelable(true);
+		mDialog.setMessage("Logging in");
+		mDialog.show();
+		mFxSession.login(USERNAME, PASSWORD, new LoginListener() {
+			@Override
+			public void onSuccess(User user) {
+				mDialog.dismiss();
+			}
+
+			@Override
+			public void onError(Exception e) {
+				mDialog.setMessage("There was a problem logging in");
+			}
+		});
+	}
+	
+	
+	
+	
+	
+	
+	private void addHead() {
+	    final TextView headView = new TextView(this);
+	    final WindowManager.LayoutParams headParam;
+		headParam=new WindowManager.LayoutParams();
+		
+		headParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+		headView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+		headParam.format = PixelFormat.RGBA_8888;
+		headParam.gravity = Gravity.TOP;
+		headParam.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+		headParam.width = LayoutParams.WRAP_CONTENT;
+		headParam.height = LayoutParams.WRAP_CONTENT;
+		mWindowManager.addView(headView,headParam);
+		
 		headView.setOnTouchListener(new View.OnTouchListener() {
 			  private int initialX;
 			  private int initialY;
@@ -163,62 +249,44 @@ public class MainActivity extends Activity implements GestureDetector.OnGestureL
 			      case MotionEvent.ACTION_MOVE:
 			        headParam.x = initialX + (int) (event.getRawX() - initialTouchX);
 			        headParam.y = initialY + (int) (event.getRawY() - initialTouchY);
-			        mWindowManager.updateViewLayout(headView , headParam);
+			        
 			        showDeleteButton();
 			        
-		        	Log.d("View", headParam.y + " " + deleteViewParam.y);
+		        	Log.d("View", headParam.y + " " + deleteViewParam.y + " " + headParam.height);
 		        	
 		        	if (headParam.y + headParam.height > deleteViewParam.y) {
+		        		if (isRateVisible) {
+		        			mWindowManager.removeView(settingButton);
+		        			mWindowManager.removeView(tradeButton);
+		        		}
 		        		mWindowManager.removeView(headView);
-		        		mWindowManager.removeView(settingButton);
-			    		mWindowManager.removeView(tradeButton);
 			    		isRateVisible = false;
 		        		hideDeleteButton();
 		        	}
-
+		        	mWindowManager.updateViewLayout(headView , headParam);
 			        return true;
 			    }
 			    return false;
 			  }
 		});
-			  
 		
-
-		handler = new Handler();
-		mFxSession = new FxClient(this, API_KEY);
-
-		mDialog = new ProgressDialog(this);
-		mDialog.setCancelable(true);
-		mDialog.setMessage("Logging in");
-		mDialog.show();
-		mFxSession.login(USERNAME, PASSWORD, new LoginListener() {
-			@Override
-			public void onSuccess(User user) {
-				mDialog.dismiss();
-			}
-
-			@Override
-			public void onError(Exception e) {
-				mDialog.setMessage("There was a problem logging in");
-			}
-		});
-
 		Runnable prices = new Runnable() {
 			@Override
 			public void run() {
-				fetchPrices();
+				fetchPrices(headView);
 				handler.postDelayed(this, POLL_INTERVAL);
 			}
 		};
 		handler.post(prices);
 	}
 
-	public void fetchPrices() {
+
+	public void fetchPrices(final TextView headView) {
 		mFxSession.getPrices(new PriceListener() {
 			@Override
 			public void onSuccess(List<Price> prices) {
 				for (Price price : prices) {
-//					view.setText(price.toString());
+					headView.setText(price.toString());
 				}
 			}
 

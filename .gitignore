@@ -25,9 +25,7 @@ proguard/
 *.pydevproject
 .project
 .metadata
-bin/**
-tmp/**
-tmp/**/*
+tmp/*
 *.tmp
 *.bak
 *.swp
