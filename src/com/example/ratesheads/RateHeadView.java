@@ -27,6 +27,7 @@ public class RateHeadView extends View {
 	private WindowManager.LayoutParams tradeParam;
 
 	private static Boolean isRateVisible;
+	private static Boolean isHeadMoved;
 
 	
 	public RateHeadView(final Context context, WindowManager windowManager) {
@@ -40,6 +41,7 @@ public class RateHeadView extends View {
 		mTextView = new TextView(context);
 		
 		isRateVisible = false;
+		isHeadMoved = false;
 		
 		final WindowManager.LayoutParams headParam;
 		headParam = new WindowManager.LayoutParams();
@@ -116,16 +118,19 @@ public class RateHeadView extends View {
 					initialY = headParam.y;
 					initialTouchX = event.getRawX();
 					initialTouchY = event.getRawY();
+					
+					isHeadMoved = false;
 					return true;
 				case MotionEvent.ACTION_UP:
 					MainActivity.hideDeleteButton();
-
-					if (!isRateVisible) {
-						addButtons();
-						isRateVisible = true;
-					} else {
-						removeButtons();
-						isRateVisible = false;
+					if (!isHeadMoved) {
+						if (!isRateVisible) {
+							addButtons();
+							isRateVisible = true;
+						} else {
+							removeButtons();
+							isRateVisible = false;
+						}
 					}
 
 					return true;
@@ -148,6 +153,8 @@ public class RateHeadView extends View {
 						MainActivity.hideDeleteButton();
 					}
 					mWindowManager.updateViewLayout(mTextView, headParam);
+					
+					isHeadMoved = true;
 					return true;
 				}
 				return false;
