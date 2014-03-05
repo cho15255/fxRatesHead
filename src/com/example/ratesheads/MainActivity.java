@@ -1,5 +1,6 @@
 package com.example.ratesheads;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -184,6 +185,7 @@ public class MainActivity extends Activity implements
 			@Override
 			public void onSuccess(List<Price> prices) {
 				for (Price price : prices) {
+					headView.updatePrice(price);
 					headView.setText(price.toString());
 				}
 			}
@@ -195,7 +197,7 @@ public class MainActivity extends Activity implements
 			}
 		}, new ArrayList<String>() {
 			{
-				add("USD/CAD");
+				add("USD/JPY");
 			}
 		});
 	}
