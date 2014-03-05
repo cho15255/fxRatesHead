@@ -50,7 +50,7 @@ public class MainActivity extends Activity implements
 
 	private GestureDetectorCompat mDetector;
 	private WindowManager mWindowManager;
-	private static View mDeleteView;
+	private static TextView mDeleteView;
 
 	public static Button settingButton;
 	public static Button tradeButton;
@@ -101,10 +101,11 @@ public class MainActivity extends Activity implements
 		mDetector = new GestureDetectorCompat(this, this);
 		mDetector.setOnDoubleTapListener(this);
 
-		mDeleteView = new View(this);
+		mDeleteView = new TextView(this);
 		mDeleteView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
 				100));
 		mDeleteView.setBackgroundColor(Color.RED);
+		//mDeleteView.setText("Delete");
 
 		deleteViewParam = new WindowManager.LayoutParams();
 		deleteViewParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
@@ -120,7 +121,7 @@ public class MainActivity extends Activity implements
 		settingParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 		settingButton = new Button(this);
 		settingButton.setLayoutParams(new LayoutParams(screenWidth / 2, 130));
-		settingButton.setBackgroundColor(color.transparent);
+		settingButton.setBackgroundResource(color.black);
 		settingButton.setText("Settings");
 		settingButton.setTextColor(getResources().getColor(R.color.oanda_green));
 		settingButton.setGravity(Gravity.CENTER);
@@ -147,7 +148,7 @@ public class MainActivity extends Activity implements
 		tradeParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 		tradeButton = new Button(this);
 		tradeButton.setLayoutParams(new LayoutParams(screenWidth / 2, 130));
-		tradeButton.setBackgroundColor(color.transparent);
+		tradeButton.setBackgroundResource(color.black);
 		tradeButton.setText("Launch fxTrade");
 		tradeButton.setTextColor(getResources().getColor(R.color.oanda_green));
 		tradeButton.setGravity(Gravity.CENTER);

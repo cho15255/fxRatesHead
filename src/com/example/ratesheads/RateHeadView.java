@@ -134,7 +134,7 @@ public class RateHeadView extends View {
 	public void setText(String text) {
 		mTextView.setTextColor(Color.WHITE);
 		mTextView.setGravity(Gravity.CENTER);
-		mTextView.setPadding(5, 5, 5, 5);
+		mTextView.setPadding(15, 10, 15, 10);
 		mTextView.setText(text);
 	}
 	
@@ -159,7 +159,7 @@ public class RateHeadView extends View {
 			final int sign = difference.signum();
 			switch (sign) {
 			case 1: 
-				mTextView.setBackgroundResource(R.drawable.rounded_rectangle_green);
+				mTextView.setBackgroundResource(R.drawable.rounded_rectangle_green_head);
 				break;
 			case 0: 
 				mTextView.setBackgroundResource(R.drawable.rounded_rectangle);

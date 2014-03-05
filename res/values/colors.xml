@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="oanda_green">#22e005</color>
+    <color name="oanda_green">#94D600</color>
     <color name="oanda_red">#ff0000</color>
+    <color name="oanda_grey">#333</color>
+    <color name="oanda_green_old">#22e005</color>
     
 </resources>
