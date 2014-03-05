@@ -36,6 +36,7 @@ public class RateHeadView extends View {
 	private WindowManager.LayoutParams headParam;
 	
 	private boolean headExist;
+	private boolean deleteHead;
 	
 	private BigDecimal currentBid;
 	private BigDecimal currentAsk;
@@ -55,6 +56,7 @@ public class RateHeadView extends View {
 		
 		isRateVisible = false;
 		isHeadMoved = false;
+		deleteHead = false;
 		
 		
 		headParam = new WindowManager.LayoutParams();
@@ -101,7 +103,19 @@ public class RateHeadView extends View {
 							MainActivity.tradeButton.setVisibility(View.GONE);
 						}
 					}
-
+					
+					if (deleteHead) {
+						if (MainActivity.settingButton.isShown()) {
+							MainActivity.settingButton.setVisibility(View.GONE);
+							MainActivity.tradeButton.setVisibility(View.GONE);
+						}
+						headExist = false;
+						mWindowManager.removeView(mTextView);
+						MainActivity.hideDeleteButton();
+						
+						deleteHead = false;
+					}
+					
 					return true;
 				case MotionEvent.ACTION_MOVE:
 					headParam.x = initialX
@@ -115,13 +129,9 @@ public class RateHeadView extends View {
 							//+ headParam.height);
 
 					if (headParam.y + headParam.height + (screenHeight/2) > MainActivity.deleteViewParam.y) {
-						if (MainActivity.settingButton.isShown()) {
-							MainActivity.settingButton.setVisibility(View.GONE);
-							MainActivity.tradeButton.setVisibility(View.GONE);
-						}
-						headExist = false;
-						mWindowManager.removeView(mTextView);
-						MainActivity.hideDeleteButton();
+						deleteHead = true;
+					} else {
+						deleteHead = false;
 					}
 					mWindowManager.updateViewLayout(mTextView, headParam);
 					
