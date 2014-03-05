@@ -14,6 +14,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -131,7 +134,7 @@ public class RateHeadView extends View {
 
 	}
 
-	public void setText(String text) {
+	public void setText(SpannableStringBuilder text) {
 		mTextView.setTextColor(Color.WHITE);
 		mTextView.setGravity(Gravity.CENTER);
 		mTextView.setPadding(15, 10, 15, 10);
@@ -191,7 +194,10 @@ public class RateHeadView extends View {
 					String text = instrument + "\n"
 							+ "Bid: " + price.bid() + "\n"
 							+ "Ask: " + price.ask();
-					setText(text);
+					 final SpannableStringBuilder sb = new SpannableStringBuilder(text);
+				     final StyleSpan bss = new StyleSpan(android.graphics.Typeface.BOLD); // Span to make text bold
+				     sb.setSpan(bss, 0, instrument.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE); // make first 4 characters Bol
+					 setText(sb);
 				}
 			}
 
