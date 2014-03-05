@@ -3,11 +3,14 @@ package com.example.ratesheads;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.R.color;
+import android.R.integer;
 import android.app.ActionBar.LayoutParams;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
@@ -146,24 +149,48 @@ public class MainActivity extends Activity implements
 		settingParam = new WindowManager.LayoutParams();
 		settingParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 		settingButton = new Button(this);
-		settingButton.setLayoutParams(new LayoutParams(
-				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+		settingButton.setLayoutParams(new LayoutParams(screenWidth / 2, 130));
+		settingButton.setBackgroundColor(color.transparent);
+		settingButton.setText("Settings");
+		settingButton.setTextColor(getResources().getColor(R.color.oanda_green));
+		settingButton.setGravity(Gravity.CENTER);
+		settingButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent mainIntent = new Intent(getApplicationContext(), MainActivity.class);
+				startActivity(mainIntent);
+			}
+		});
+		
 		settingParam.format = PixelFormat.RGBA_8888;
 		settingParam.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
 		settingParam.gravity = Gravity.TOP | Gravity.LEFT;
-		settingParam.width = LayoutParams.WRAP_CONTENT;
-		settingParam.height = LayoutParams.WRAP_CONTENT;
+		settingParam.width = settingButton.getLayoutParams().width;
+		settingParam.height = settingButton.getLayoutParams().height;
 
 		tradeParam = new WindowManager.LayoutParams();
 		tradeParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 		tradeButton = new Button(this);
-		tradeButton.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT,
-				LayoutParams.WRAP_CONTENT));
+		tradeButton.setLayoutParams(new LayoutParams(screenWidth / 2, 130));
+		tradeButton.setBackgroundColor(color.transparent);
+		tradeButton.setText("Launch fxTrade");
+		tradeButton.setTextColor(getResources().getColor(R.color.oanda_green));
+		tradeButton.setGravity(Gravity.CENTER);
+		tradeButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
 		tradeParam.format = PixelFormat.RGBA_8888;
 		tradeParam.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
 		tradeParam.gravity = Gravity.TOP | Gravity.RIGHT;
-		tradeParam.width = LayoutParams.WRAP_CONTENT;
-		tradeParam.height = LayoutParams.WRAP_CONTENT;
+		tradeParam.width = tradeButton.getLayoutParams().width;
+		tradeParam.height = tradeButton.getLayoutParams().height;
 
 		mDetector = new GestureDetectorCompat(this, this);
 		mDetector.setOnDoubleTapListener(this);
@@ -237,14 +264,10 @@ public class MainActivity extends Activity implements
 					hideDeleteButton();
 
 					if (!isRateVisible) {
-						mWindowManager.addView(settingButton, settingParam);
-						mWindowManager.addView(tradeButton, tradeParam);
+						addButtons();
 					} else {
-						mWindowManager.removeView(settingButton);
-						mWindowManager.removeView(tradeButton);
+						removeButtons();
 					}
-
-					isRateVisible = !isRateVisible;
 
 					return true;
 				case MotionEvent.ACTION_MOVE:
@@ -260,11 +283,11 @@ public class MainActivity extends Activity implements
 
 					if (headParam.y + headParam.height > deleteViewParam.y) {
 						if (isRateVisible) {
-							mWindowManager.removeView(settingButton);
-							mWindowManager.removeView(tradeButton);
+							removeButtons();
+							isRateVisible = false;
 						}
+
 						mWindowManager.removeView(headView);
-						isRateVisible = false;
 						hideDeleteButton();
 					}
 					mWindowManager.updateViewLayout(headView, headParam);
@@ -311,6 +334,20 @@ public class MainActivity extends Activity implements
 
 	public void hideDeleteButton() {
 		mDeleteView.setVisibility(View.GONE);
+	}
+
+	public void addButtons() {
+		mWindowManager.addView(settingButton, settingParam);
+		mWindowManager.addView(tradeButton, tradeParam);
+
+		isRateVisible = true;
+	}
+
+	public void removeButtons() {
+		mWindowManager.removeView(settingButton);
+		mWindowManager.removeView(tradeButton);
+
+		isRateVisible = false;
 	}
 
 	@Override
