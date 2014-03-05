@@ -39,7 +39,7 @@ public class MainActivity extends Activity implements
 
 	private GestureDetectorCompat mDetector;
 	private WindowManager mWindowManager;
-	private View mDeleteView;
+	private static View mDeleteView;
 
 	private ArrayAdapter<String> mRatesAdapter;
 	private ProgressDialog mDialog;
@@ -50,23 +50,18 @@ public class MainActivity extends Activity implements
 	private static final String PASSWORD = "password1";
 	private static final String API_KEY = "0325ee6232373738";
 
-	private Boolean isRateVisible;
-	private Button settingButton;
-	private Button tradeButton;
+
 	private FxClient mFxSession;
 	private Dialog stripesDialog;
 	private Dialog triangleDialog;
 
-	private WindowManager.LayoutParams settingParam;
-	private WindowManager.LayoutParams tradeParam;
-	private WindowManager.LayoutParams deleteViewParam;
+
+	public static WindowManager.LayoutParams deleteViewParam;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
-		isRateVisible = false;
 
 		DisplayMetrics displaymetrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
@@ -126,44 +121,10 @@ public class MainActivity extends Activity implements
 			}
 		});
 
-		/*
-		 * final WindowManager.LayoutParams headParam = new
-		 * WindowManager.LayoutParams(); headParam.flags =
-		 * WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE; final ImageView
-		 * headView = new ImageView(this); headView.setLayoutParams(new
-		 * LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-		 * headView.setImageResource(R.drawable.ic_launcher); headParam.format =
-		 * PixelFormat.RGBA_8888; headParam.gravity = Gravity.TOP;
-		 * headParam.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
-		 * headParam.width = (parent != null) ? LayoutParams.WRAP_CONTENT :
-		 * headView .getLayoutParams().width; headParam.height = (parent!=null)
-		 * ? LayoutParams.WRAP_CONTENT : headView .getLayoutParams().height;
-		 */
-
 		mWindowManager = (WindowManager) getApplicationContext()
 				.getSystemService(Context.WINDOW_SERVICE);
 
-		settingParam = new WindowManager.LayoutParams();
-		settingParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-		settingButton = new Button(this);
-		settingButton.setLayoutParams(new LayoutParams(
-				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-		settingParam.format = PixelFormat.RGBA_8888;
-		settingParam.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
-		settingParam.gravity = Gravity.TOP | Gravity.LEFT;
-		settingParam.width = LayoutParams.WRAP_CONTENT;
-		settingParam.height = LayoutParams.WRAP_CONTENT;
 
-		tradeParam = new WindowManager.LayoutParams();
-		tradeParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-		tradeButton = new Button(this);
-		tradeButton.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT,
-				LayoutParams.WRAP_CONTENT));
-		tradeParam.format = PixelFormat.RGBA_8888;
-		tradeParam.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
-		tradeParam.gravity = Gravity.TOP | Gravity.RIGHT;
-		tradeParam.width = LayoutParams.WRAP_CONTENT;
-		tradeParam.height = LayoutParams.WRAP_CONTENT;
 
 		mDetector = new GestureDetectorCompat(this, this);
 		mDetector.setOnDoubleTapListener(this);
@@ -204,75 +165,7 @@ public class MainActivity extends Activity implements
 	}
 
 	private void addHead() {
-		final TextView headView = new TextView(this);
-		final WindowManager.LayoutParams headParam;
-		headParam = new WindowManager.LayoutParams();
-
-		headParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-		headView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT,
-				LayoutParams.WRAP_CONTENT));
-		headParam.format = PixelFormat.RGBA_8888;
-		headParam.gravity = Gravity.TOP;
-		headParam.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
-		headParam.width = LayoutParams.WRAP_CONTENT;
-		headParam.height = LayoutParams.WRAP_CONTENT;
-		mWindowManager.addView(headView, headParam);
-
-		headView.setOnTouchListener(new View.OnTouchListener() {
-			private int initialX;
-			private int initialY;
-			private float initialTouchX;
-			private float initialTouchY;
-
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				switch (event.getAction()) {
-				case MotionEvent.ACTION_DOWN:
-					initialX = headParam.x;
-					initialY = headParam.y;
-					initialTouchX = event.getRawX();
-					initialTouchY = event.getRawY();
-					return true;
-				case MotionEvent.ACTION_UP:
-					hideDeleteButton();
-
-					if (!isRateVisible) {
-						mWindowManager.addView(settingButton, settingParam);
-						mWindowManager.addView(tradeButton, tradeParam);
-					} else {
-						mWindowManager.removeView(settingButton);
-						mWindowManager.removeView(tradeButton);
-					}
-
-					isRateVisible = !isRateVisible;
-
-					return true;
-				case MotionEvent.ACTION_MOVE:
-					headParam.x = initialX
-							+ (int) (event.getRawX() - initialTouchX);
-					headParam.y = initialY
-							+ (int) (event.getRawY() - initialTouchY);
-
-					showDeleteButton();
-
-					Log.d("View", headParam.y + " " + deleteViewParam.y + " "
-							+ headParam.height);
-
-					if (headParam.y + headParam.height > deleteViewParam.y) {
-						if (isRateVisible) {
-							mWindowManager.removeView(settingButton);
-							mWindowManager.removeView(tradeButton);
-						}
-						mWindowManager.removeView(headView);
-						isRateVisible = false;
-						hideDeleteButton();
-					}
-					mWindowManager.updateViewLayout(headView, headParam);
-					return true;
-				}
-				return false;
-			}
-		});
+		final RateHeadView headView = new RateHeadView(this, mWindowManager);
 
 		Runnable prices = new Runnable() {
 			@Override
@@ -284,7 +177,7 @@ public class MainActivity extends Activity implements
 		handler.post(prices);
 	}
 
-	public void fetchPrices(final TextView headView) {
+	public void fetchPrices(final RateHeadView headView) {
 		mFxSession.getPrices(new PriceListener() {
 			@Override
 			public void onSuccess(List<Price> prices) {
@@ -305,11 +198,11 @@ public class MainActivity extends Activity implements
 		});
 	}
 
-	public void showDeleteButton() {
+	public static void showDeleteButton() {
 		mDeleteView.setVisibility(View.VISIBLE);
 	}
 
-	public void hideDeleteButton() {
+	public static void hideDeleteButton() {
 		mDeleteView.setVisibility(View.GONE);
 	}
 
