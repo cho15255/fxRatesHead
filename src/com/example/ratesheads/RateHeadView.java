@@ -153,7 +153,7 @@ public class RateHeadView extends View {
 			}
 			BigDecimal difference = newBid.subtract(currentBid);
 			BigDecimal precision = price.instrument().precision();
-			difference = difference.movePointRight(precision.intValue()+1);
+			difference = difference.movePointRight(precision.intValue());
 			Log.i("DIFFERENCE", difference.intValue() + "");
 			headParam.y = headParam.y - (difference.intValue()*2);
 			final int sign = difference.signum();
@@ -181,6 +181,7 @@ public class RateHeadView extends View {
 	}
 	
 	public void fetchPrices(final FxClient fxSession, final String currentHead) {
+		
 		fxSession.getPrices(new PriceListener() {
 			@Override
 			public void onSuccess(List<Price> prices) {
