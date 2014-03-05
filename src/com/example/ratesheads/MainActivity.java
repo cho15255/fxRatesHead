@@ -9,6 +9,8 @@ import android.R.integer;
 import android.app.ActionBar.LayoutParams;
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.FragmentManager;
+import android.app.ListFragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -16,7 +18,10 @@ import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GestureDetectorCompat;
+import android.text.SpannableString;
+import android.text.style.UnderlineSpan;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -33,8 +38,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.oanda.fxtrade.sdk.FxClient;
+import com.oanda.fxtrade.sdk.Instrument;
 import com.oanda.fxtrade.sdk.Price;
 import com.oanda.fxtrade.sdk.User;
+import com.oanda.fxtrade.sdk.network.InstrumentListener;
 import com.oanda.fxtrade.sdk.network.LoginListener;
 import com.oanda.fxtrade.sdk.network.PriceListener;
 
@@ -47,14 +54,15 @@ public class MainActivity extends Activity implements
 
 	private ArrayAdapter<String> mRatesAdapter;
 	private ProgressDialog mDialog;
-	private Handler handler;
+	private static Handler handler;
 
 	private static final int POLL_INTERVAL = 1000; // 3 seconds
 	private static final String USERNAME = "mobileusa";
 	private static final String PASSWORD = "password1";
 	private static final String API_KEY = "0325ee6232373738";
 
-
+	private List<String> instrumentsList;
+	private static String currentHead;
 	private FxClient mFxSession;
 	private Dialog stripesDialog;
 	private Dialog triangleDialog;
@@ -72,56 +80,12 @@ public class MainActivity extends Activity implements
 		int screenHeight = displaymetrics.heightPixels;
 		int screenWidth = displaymetrics.widthPixels;
 
-		stripesDialog = new Dialog(this);
-		stripesDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		triangleDialog = new Dialog(this);
-		triangleDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
 		Button stripeOptionsButton = (Button) findViewById(R.id.stripesButton);
 		stripeOptionsButton.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				stripesDialog.setContentView(R.layout.dialog);
-				stripesDialog.setCancelable(false);
-				stripesDialog.show();
-
-				Button stripeOptionsDialogButton = (Button) stripesDialog
-						.findViewById(R.id.dialog_button);
-				stripeOptionsDialogButton.setText("Add Stripe");
-				stripeOptionsDialogButton
-						.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								stripesDialog.dismiss();
-								addHead();
-							}
-						});
-			}
-		});
-
-		Button triangleOptionsButton = (Button) findViewById(R.id.triangleButton);
-		triangleOptionsButton.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				triangleDialog.setContentView(R.layout.dialog);
-				triangleDialog.setCancelable(false);
-				triangleDialog.show();
-
-				Button triangleOptionsDialogButton = (Button) triangleDialog
-						.findViewById(R.id.dialog_button);
-				triangleOptionsDialogButton.setText("Add Triangle");
-				triangleOptionsDialogButton
-						.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								triangleDialog.dismiss();
-								addHead();
-							}
-						});
+				addHead();
 			}
 		});
 
@@ -164,43 +128,34 @@ public class MainActivity extends Activity implements
 				mDialog.setMessage("There was a problem logging in");
 			}
 		});
-	}
-
-	private void addHead() {
-		
-		final RateHeadView headView = new RateHeadView(this, mWindowManager);
-
-		Runnable prices = new Runnable() {
+		final InstrumentList instrumentList = new InstrumentList();
+		mFxSession.getInstruments(new InstrumentListener() {
+			
 			@Override
-			public void run() {
-				fetchPrices(headView);
-				handler.postDelayed(this, POLL_INTERVAL);
-			}
-		};
-		handler.post(prices);
-	}
-
-	public void fetchPrices(final RateHeadView headView) {
-		mFxSession.getPrices(new PriceListener() {
-			@Override
-			public void onSuccess(List<Price> prices) {
-				for (Price price : prices) {
-					headView.updatePrice(price);
-					headView.setText(price.toString());
+			public void onSuccess(List<Instrument> arg0) {
+				List<String> instrumentListString = new ArrayList<String>(arg0.size()); 
+				for (Instrument instrument : arg0){
+					instrumentListString.add(instrument.displayName());
 				}
+				instrumentsList = instrumentListString;
+				instrumentList.setInstruments(instrumentListString);
 			}
-
+			
 			@Override
-			public void onError(Exception e) {
-				Toast.makeText(getApplicationContext(),
-						"Problem fetching prices", Toast.LENGTH_SHORT).show();
-			}
-		}, new ArrayList<String>() {
-			{
-				add("USD/JPY");
+			public void onError(Exception arg0) {
+				// TODO Auto-generated method stub
+				
 			}
 		});
+		FragmentManager fragmentManager = getFragmentManager();
+		fragmentManager.beginTransaction().add(R.id.listFragment, instrumentList, "LIST").commit();
 	}
+		
+		private void addHead() {
+			
+			final RateHeadView headView = new RateHeadView(this, mWindowManager);
+			headView.setRun(mFxSession, currentHead);
+		}
 
 	public static void showDeleteButton() {
 		mDeleteView.setVisibility(View.VISIBLE);
@@ -273,6 +228,17 @@ public class MainActivity extends Activity implements
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
 		return false;
+	}
+	
+	public static void setHeadInstrument(String instrument){
+		currentHead = instrument;
+	}
+	
+	public static void postHandle(Runnable prices){
+		handler.post(prices);
+	}
+	public static void postHandleDelay(Runnable runnable){
+		handler.postDelayed(runnable, POLL_INTERVAL);
 	}
 
 }

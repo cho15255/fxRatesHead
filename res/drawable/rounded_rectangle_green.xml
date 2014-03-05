@@ -8,7 +8,10 @@
         android:topLeftRadius="10dp"
         android:topRightRadius="10dp" />
 	
-    <solid
+    <stroke
+        android:width="0.5dp"
         android:color="@android:color/darker_gray" />
+    
+    <solid android:color="@color/oanda_green"/>
 
 </shape>

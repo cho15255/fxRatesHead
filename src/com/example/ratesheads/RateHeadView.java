@@ -1,8 +1,12 @@
 package com.example.ratesheads;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.oanda.fxtrade.sdk.FxClient;
 import com.oanda.fxtrade.sdk.Price;
+import com.oanda.fxtrade.sdk.network.PriceListener;
 
 import android.R.color;
 import android.app.ActionBar.LayoutParams;
@@ -19,6 +23,7 @@ import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class RateHeadView extends View {
 	private TextView mTextView;
@@ -178,7 +183,9 @@ public class RateHeadView extends View {
 	}
 
 	public void setText(String text) {
-		mTextView.setBackgroundColor(Color.RED);
+		mTextView.setTextColor(Color.WHITE);
+		mTextView.setGravity(Gravity.CENTER);
+		mTextView.setPadding(5, 5, 5, 5);
 		mTextView.setText(text);
 	}
 	
@@ -200,6 +207,20 @@ public class RateHeadView extends View {
 			difference = difference.movePointRight(precision.intValue()+1);
 			Log.i("DIFFERENCE", difference.intValue() + "");
 			headParam.y = headParam.y - (difference.intValue()*2);
+			final int sign = difference.signum();
+			switch (sign) {
+			case 1: 
+				mTextView.setBackgroundResource(R.drawable.rounded_rectangle_green);
+				break;
+			case 0: 
+				mTextView.setBackgroundResource(R.drawable.rounded_rectangle);
+				break;
+			case -1:
+				mTextView.setBackgroundResource(R.drawable.rounded_rectangle_red);
+				break;
+			default:
+				break;
+			}
 			mWindowManager.updateViewLayout(mTextView, headParam);
 		}
 	}
@@ -218,5 +239,39 @@ public class RateHeadView extends View {
 	public void removeButtons() {
 		mWindowManager.removeView(settingButton);
 		mWindowManager.removeView(tradeButton);
+	}
+	
+	public void fetchPrices(final FxClient fxSession, final String currentHead) {
+		fxSession.getPrices(new PriceListener() {
+			@Override
+			public void onSuccess(List<Price> prices) {
+				for (Price price : prices) {
+					updatePrice(price);
+					String instrument=getResources().getString(R.string.instrument, price.instrument().displayName());
+					String text = instrument + "\n"
+							+ "Bid: " + price.bid() + "\n"
+							+ "Ask: " + price.ask();
+					setText(text);
+				}
+			}
+
+			@Override
+			public void onError(Exception e) {
+			}
+		}, new ArrayList<String>() {
+			{
+				add(currentHead);
+			}
+		});
+	}
+	public void setRun(final FxClient fxSession,final String currentHead){
+		Runnable prices = new Runnable() {
+			@Override
+			public void run() {
+				fetchPrices(fxSession, currentHead);
+				MainActivity.postHandleDelay(this);
+			}
+		};
+		MainActivity.postHandle(prices);
 	}
 }
