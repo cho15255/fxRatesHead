@@ -1,6 +1,5 @@
 package com.example.ratesheads;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,10 +44,14 @@ public class MainActivity extends Activity implements GestureDetector.OnGestureL
 	private Handler handler;
 
 	private static final int POLL_INTERVAL = 1000; // 3 seconds
-	private TextView view;
 	private static final String USERNAME = "mobileusa";
 	private static final String PASSWORD = "password1";
 	private static final String API_KEY = "0325ee6232373738";
+	
+	private Boolean isRateVisible;
+	private TextView view;
+	private Button settingButton;
+	private Button tradeButton;
 	private FxClient mFxSession;
 
 	@Override
@@ -55,6 +59,8 @@ public class MainActivity extends Activity implements GestureDetector.OnGestureL
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		isRateVisible = false;
+		
 		DisplayMetrics displaymetrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
 		int screenHeight = displaymetrics.heightPixels;
@@ -63,9 +69,9 @@ public class MainActivity extends Activity implements GestureDetector.OnGestureL
 		final WindowManager.LayoutParams headParam = new WindowManager.LayoutParams();
 		headParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 		final ImageView headView = new ImageView(this);
-		headView .setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-		headView .setImageResource(R.drawable.ic_launcher);
-		final ViewGroup parent = (ViewGroup)headView .getParent();
+		headView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+		headView.setImageResource(R.drawable.ic_launcher);
+		ViewGroup parent = (ViewGroup)headView .getParent();
 		if (parent != null)
 		  parent.removeView(headView );
 		headParam.format = PixelFormat.RGBA_8888;
@@ -73,8 +79,36 @@ public class MainActivity extends Activity implements GestureDetector.OnGestureL
 		headParam.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
 		headParam.width = (parent != null) ? LayoutParams.WRAP_CONTENT : headView .getLayoutParams().width;
 		headParam.height = (parent!=null) ? LayoutParams.WRAP_CONTENT : headView .getLayoutParams().height;
-//		headParam.x = (screenWidth - headView.getLayoutParams().width) / 2;
-//		headParam.y = (screenHeight - headView.getLayoutParams().height) / 2;
+		
+		final WindowManager.LayoutParams settingParam = new WindowManager.LayoutParams();
+		settingParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+		settingButton = new Button(this);
+		settingButton.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+		parent = (ViewGroup) settingButton.getParent();
+		if (parent != null)
+			parent.removeView(settingButton);
+		settingParam.format = PixelFormat.RGBA_8888;
+		settingParam.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+		settingParam.gravity = Gravity.TOP | Gravity.LEFT;
+		settingParam.width = parent != null ? LayoutParams.WRAP_CONTENT : settingButton
+				.getLayoutParams().width;
+		settingParam.height = parent != null ? LayoutParams.WRAP_CONTENT : settingButton
+				.getLayoutParams().height;
+		
+		final WindowManager.LayoutParams tradeParam = new WindowManager.LayoutParams();
+		tradeParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+		tradeButton = new Button(this);
+		tradeButton.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+		parent = (ViewGroup) tradeButton.getParent();
+		if (parent != null)
+			parent.removeView(tradeButton);
+		tradeParam.format = PixelFormat.RGBA_8888;
+		tradeParam.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+		tradeParam.gravity = Gravity.TOP | Gravity.RIGHT;
+		tradeParam.width = parent != null ? LayoutParams.WRAP_CONTENT : tradeButton
+				.getLayoutParams().width;
+		tradeParam.height = parent != null ? LayoutParams.WRAP_CONTENT : tradeButton
+				.getLayoutParams().height;
 
 		mWindowManager = (WindowManager)getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
 		mWindowManager.addView(headView ,headParam);
@@ -114,6 +148,17 @@ public class MainActivity extends Activity implements GestureDetector.OnGestureL
 			        return true;
 			      case MotionEvent.ACTION_UP:
 			    	  hideDeleteButton();
+			    	  
+			    	  if (!isRateVisible) {
+			    		  mWindowManager.addView(settingButton, settingParam);
+			    		  mWindowManager.addView(tradeButton, tradeParam);
+			    	  } else {
+			    		  mWindowManager.removeView(settingButton);
+			    		  mWindowManager.removeView(tradeButton);
+			    	  }
+			    	  
+			    	  isRateVisible = !isRateVisible;
+			    	  
 			        return true;
 			      case MotionEvent.ACTION_MOVE:
 			        headParam.x = initialX + (int) (event.getRawX() - initialTouchX);
@@ -125,6 +170,9 @@ public class MainActivity extends Activity implements GestureDetector.OnGestureL
 		        	
 		        	if (headParam.y + headParam.height > deleteViewParam.y) {
 		        		mWindowManager.removeView(headView);
+		        		mWindowManager.removeView(settingButton);
+			    		mWindowManager.removeView(tradeButton);
+			    		isRateVisible = false;
 		        		hideDeleteButton();
 		        	}
 
