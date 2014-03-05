@@ -135,7 +135,7 @@ public class MainActivity extends Activity implements
 			public void onSuccess(List<Instrument> arg0) {
 				List<String> instrumentListString = new ArrayList<String>(arg0.size()); 
 				for (Instrument instrument : arg0){
-					instrumentListString.add(instrument.displayName());
+					instrumentListString.add(instrument.instrument());
 				}
 				instrumentsList = instrumentListString;
 				instrumentList.setInstruments(instrumentListString);
