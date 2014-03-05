@@ -16,6 +16,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentTransaction;
@@ -160,8 +161,8 @@ public class MainActivity extends Activity implements
 
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
-
+				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://oanda.com/ratesHeads"));
+				startActivity(browserIntent);
 			}
 		});
 
