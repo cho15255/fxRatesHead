@@ -120,7 +120,7 @@ public class MainActivity extends Activity implements
 		settingParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 		settingButton = new Button(this);
 		settingButton.setLayoutParams(new LayoutParams(screenWidth / 2, 130));
-		settingButton.setBackgroundColor(color.transparent);
+//		settingButton.setBackgroundColor(color.darker_gray);
 		settingButton.setText("Settings");
 		settingButton.setTextColor(getResources().getColor(R.color.oanda_green));
 		settingButton.setGravity(Gravity.CENTER);
@@ -147,7 +147,7 @@ public class MainActivity extends Activity implements
 		tradeParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 		tradeButton = new Button(this);
 		tradeButton.setLayoutParams(new LayoutParams(screenWidth / 2, 130));
-		tradeButton.setBackgroundColor(color.transparent);
+//		tradeButton.setBackgroundColor(color.darker_gray);
 		tradeButton.setText("Launch fxTrade");
 		tradeButton.setTextColor(getResources().getColor(R.color.oanda_green));
 		tradeButton.setGravity(Gravity.CENTER);
