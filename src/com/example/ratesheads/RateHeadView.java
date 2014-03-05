@@ -29,12 +29,6 @@ public class RateHeadView extends View {
 	private TextView mTextView;
 	private WindowManager mWindowManager;
 
-	private Button settingButton;
-	private Button tradeButton;
-	
-	private WindowManager.LayoutParams settingParam;
-	private WindowManager.LayoutParams tradeParam;
-
 	private static Boolean isRateVisible;
 	private WindowManager.LayoutParams headParam;
 	
@@ -74,52 +68,6 @@ public class RateHeadView extends View {
 		mWindowManager.addView(mTextView, headParam);
 		headExist = true;
 		
-		settingParam = new WindowManager.LayoutParams();
-		settingParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-		settingButton = new Button(context);
-		settingButton.setLayoutParams(new LayoutParams(screenWidth / 2, 130));
-		settingButton.setBackgroundColor(color.transparent);
-		settingButton.setText("Settings");
-		settingButton.setTextColor(getResources().getColor(R.color.oanda_green));
-		settingButton.setGravity(Gravity.CENTER);
-		settingButton.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				Intent mainIntent = new Intent(context, MainActivity.class);
-				context.startActivity(mainIntent);
-			}
-		});
-		
-		settingParam.format = PixelFormat.RGBA_8888;
-		settingParam.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
-		settingParam.gravity = Gravity.TOP | Gravity.LEFT;
-		settingParam.width = settingButton.getLayoutParams().width;
-		settingParam.height = settingButton.getLayoutParams().height;
-
-		tradeParam = new WindowManager.LayoutParams();
-		tradeParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-		tradeButton = new Button(context);
-		tradeButton.setLayoutParams(new LayoutParams(screenWidth / 2, 130));
-		tradeButton.setBackgroundColor(color.transparent);
-		tradeButton.setText("Launch fxTrade");
-		tradeButton.setTextColor(getResources().getColor(R.color.oanda_green));
-		tradeButton.setGravity(Gravity.CENTER);
-		tradeButton.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
-		
-		tradeParam.format = PixelFormat.RGBA_8888;
-		tradeParam.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
-		tradeParam.gravity = Gravity.TOP | Gravity.RIGHT;
-		tradeParam.width = tradeButton.getLayoutParams().width;
-		tradeParam.height = tradeButton.getLayoutParams().height;
-		
 		mTextView.setOnTouchListener(new View.OnTouchListener() {
 			private int initialX;
 			private int initialY;
@@ -142,12 +90,12 @@ public class RateHeadView extends View {
 					mWindowManager.updateViewLayout(mTextView, headParam);
 					MainActivity.hideDeleteButton();
 					if (!isHeadMoved) {
-						if (!isRateVisible) {
-							addButtons();
-							isRateVisible = true;
+						if (!MainActivity.settingButton.isShown()) {
+							MainActivity.settingButton.setVisibility(View.VISIBLE);
+							MainActivity.tradeButton.setVisibility(View.VISIBLE);
 						} else {
-							removeButtons();
-							isRateVisible = false;
+							MainActivity.settingButton.setVisibility(View.GONE);
+							MainActivity.tradeButton.setVisibility(View.GONE);
 						}
 					}
 
@@ -164,8 +112,9 @@ public class RateHeadView extends View {
 							//+ headParam.height);
 
 					if (headParam.y + headParam.height + (screenHeight/2) > MainActivity.deleteViewParam.y) {
-						if (isRateVisible) {
-							removeButtons();
+						if (MainActivity.settingButton.isShown()) {
+							MainActivity.settingButton.setVisibility(View.GONE);
+							MainActivity.tradeButton.setVisibility(View.GONE);
 						}
 						headExist = false;
 						mWindowManager.removeView(mTextView);
@@ -229,16 +178,6 @@ public class RateHeadView extends View {
 	public void setOnTouchListener(OnTouchListener l) {
 		// TODO Auto-generated method stub
 		super.setOnTouchListener(l);
-	}
-	
-	public void addButtons() {
-		mWindowManager.addView(settingButton, settingParam);
-		mWindowManager.addView(tradeButton, tradeParam);
-	}
-
-	public void removeButtons() {
-		mWindowManager.removeView(settingButton);
-		mWindowManager.removeView(tradeButton);
 	}
 	
 	public void fetchPrices(final FxClient fxSession, final String currentHead) {

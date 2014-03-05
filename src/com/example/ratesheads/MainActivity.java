@@ -52,6 +52,12 @@ public class MainActivity extends Activity implements
 	private WindowManager mWindowManager;
 	private static View mDeleteView;
 
+	public static Button settingButton;
+	public static Button tradeButton;
+	
+	private WindowManager.LayoutParams settingParam;
+	private WindowManager.LayoutParams tradeParam;
+	
 	private ArrayAdapter<String> mRatesAdapter;
 	private ProgressDialog mDialog;
 	private static Handler handler;
@@ -109,6 +115,58 @@ public class MainActivity extends Activity implements
 		deleteViewParam.y = screenHeight - mDeleteView.getLayoutParams().height;
 		mWindowManager.addView(mDeleteView, deleteViewParam);
 		mDeleteView.setVisibility(View.GONE);
+		
+		settingParam = new WindowManager.LayoutParams();
+		settingParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+		settingButton = new Button(this);
+		settingButton.setLayoutParams(new LayoutParams(screenWidth / 2, 130));
+		settingButton.setBackgroundColor(color.transparent);
+		settingButton.setText("Settings");
+		settingButton.setTextColor(getResources().getColor(R.color.oanda_green));
+		settingButton.setGravity(Gravity.CENTER);
+		settingButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent mainIntent = new Intent(getApplicationContext(), MainActivity.class);
+				startActivity(mainIntent);
+				MainActivity.settingButton.setVisibility(View.GONE);
+				MainActivity.tradeButton.setVisibility(View.GONE);
+			}
+		});
+		
+		settingParam.format = PixelFormat.RGBA_8888;
+		settingParam.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+		settingParam.gravity = Gravity.TOP | Gravity.LEFT;
+		settingParam.width = settingButton.getLayoutParams().width;
+		settingParam.height = settingButton.getLayoutParams().height;
+		mWindowManager.addView(settingButton, settingParam);
+		settingButton.setVisibility(View.GONE);
+
+		tradeParam = new WindowManager.LayoutParams();
+		tradeParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+		tradeButton = new Button(this);
+		tradeButton.setLayoutParams(new LayoutParams(screenWidth / 2, 130));
+		tradeButton.setBackgroundColor(color.transparent);
+		tradeButton.setText("Launch fxTrade");
+		tradeButton.setTextColor(getResources().getColor(R.color.oanda_green));
+		tradeButton.setGravity(Gravity.CENTER);
+		tradeButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
+		tradeParam.format = PixelFormat.RGBA_8888;
+		tradeParam.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+		tradeParam.gravity = Gravity.TOP | Gravity.RIGHT;
+		tradeParam.width = tradeButton.getLayoutParams().width;
+		tradeParam.height = tradeButton.getLayoutParams().height;
+		mWindowManager.addView(tradeButton, tradeParam);
+		tradeButton.setVisibility(View.GONE);
 
 		handler = new Handler();
 		mFxSession = new FxClient(this, API_KEY);
