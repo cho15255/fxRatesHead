@@ -206,7 +206,7 @@ public class MainActivity extends Activity implements
 			}
 		});
 		FragmentManager fragmentManager = getFragmentManager();
-		fragmentManager.beginTransaction().add(R.id.listFragment, instrumentList, "LIST").commit();
+		fragmentManager.beginTransaction().add(R.id.listFragmentRelative, instrumentList, "LIST").commit();
 	}
 		
 		private void addHead() {
@@ -228,13 +228,6 @@ public class MainActivity extends Activity implements
 		this.mDetector.onTouchEvent(event);
 
 		return super.onTouchEvent(event);
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
 	}
 
 	@Override

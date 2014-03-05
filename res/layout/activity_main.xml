@@ -9,11 +9,23 @@
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:orientation="vertical" >
+        
+       <RelativeLayout 
+      	    android:id="@+id/listFragmentRelative"
+      	    android:layout_height="0dp"
+      	    android:layout_width="match_parent"
+      	    android:layout_weight="0.8"/>
+       
+       <View 
+                android:layout_width="match_parent"
+            	android:layout_height="2dp"
+            	android:background="@color/oanda_green"/>
 
       	<RelativeLayout
+      	    android:id="@+id/addButtonLayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.3" >
+            android:layout_weight="0.2" >
             <Button
                 android:id="@+id/stripesButton"
                 android:padding="10dp"
@@ -26,17 +38,10 @@
             
         </RelativeLayout>
         
-      	<View 
-                android:layout_width="match_parent"
-            	android:layout_height="2dp"
-            	android:background="@color/oanda_green"/>
+      	
         
         
-      	<RelativeLayout 
-      	    android:id="@+id/listFragment"
-      	    android:layout_height="0dp"
-      	    android:layout_width="match_parent"
-      	    android:layout_weight="0.7"/>
+      	
 
 
     </LinearLayout>
