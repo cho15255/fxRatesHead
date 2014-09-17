@@ -55,7 +55,7 @@ public class MainActivity extends Activity implements
 	private static final int POLL_INTERVAL = 1000; // 3 seconds
 	private static final String USERNAME = "mobileusa";
 	private static final String PASSWORD = "password1";
-	private static final String API_KEY = "0325ee6232373738";
+	private static final String API_KEY = "";
 
 	private List<String> instrumentsList;
 	private static String currentHead;
